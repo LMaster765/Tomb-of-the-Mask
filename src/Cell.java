@@ -57,7 +57,7 @@ public class Cell {
         if (data.length() > 0) {
             value = Integer.parseInt(data);
             if (value == 1) {
-                if (Math.random() < 1)
+                if (Math.random() < 0.5)
                     value = 2;
                 else
                     value = 1;
