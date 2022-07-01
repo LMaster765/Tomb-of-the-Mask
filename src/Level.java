@@ -201,6 +201,7 @@ public class Level implements KeyListener {
                 if (pPos[1] >= map.size() - Math.ceil(waterHeight)) {
                     player.setAlive(false);
                 }
+                player.setAnimationKey(getAnimationKey(2, 6));
 
                 // secret endless level!
                 if (name.equals("???")) {
@@ -329,19 +330,6 @@ public class Level implements KeyListener {
             gP.fillRect(0, map.size() * camera.getScale() - screenHeight, Game.WIDTH, screenHeight);
         }
 
-        TimeTracker.start("draw player");
-
-        int xPos = (int) (player.getX() * camera.getScale() - camera.getX());
-        int yPos = (int) (player.getY() * camera.getScale() - camera.getY());
-        try {
-            BufferedImage img = ImageIO.read(new File(player.getImagePath(this)));
-            gP.drawImage(Cell.transformImage(img, player.getDirVis() * Math.PI / 2,
-                    camera.getScale() / (double) Game.IMAGE_SIZE), xPos, yPos, frame);
-        } catch (IOException e) {
-            System.out.println("Player image " + player.getImagePath(this) + " failed to load");
-            gP.fillRect(xPos, yPos, camera.getScale(), camera.getScale());
-        }
-
         TimeTracker.start("draw image");
 
         g.drawImage(preFrame, 0, 0, null);
@@ -406,6 +394,10 @@ public class Level implements KeyListener {
 
     public ArrayList<Entity> getEntities() {
         return entities;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     public void keyPressed(KeyEvent e) {

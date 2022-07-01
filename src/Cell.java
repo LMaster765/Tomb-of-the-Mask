@@ -259,11 +259,6 @@ public class Cell {
         return imgCode.substring(0, 8);
     }
 
-    public String getImagePath() {
-        return Game.IMAGES + type + "/tilesheet.png";
-        // return Game.IMAGES + type + "/" + imgCode.substring(0, 8) + "-0.png";
-    }
-
     /**
      * @return a non-transformed BufferedImage of the cell without dots
      */

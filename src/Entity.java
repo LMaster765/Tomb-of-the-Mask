@@ -122,14 +122,6 @@ public class Entity {
         return xDir == 0 && yDir == 0;
     }
 
-    public String getImagePath() {
-        return Game.IMAGES + type + "/" + 0;
-    }
-
-    public String getImagePath(String name) {
-        return Game.IMAGES + type + "/" + name;
-    }
-
     public BufferedImage getImage(int scale) {
         return null;
     }
@@ -192,17 +184,6 @@ class Bat extends Entity {
         }
     }
 
-    public String getImagePath() {
-        switch (getDirChar()) {
-            case "^":
-            case ">":
-                return getImagePath("0-" + getFrame() + ".png");
-            case "v":
-            case "<":
-                return getImagePath("1-" + getFrame() + ".png");
-        }
-        return getImagePath("0-0.png");
-    }
     public BufferedImage getImage(int scale) {
         BufferedImage sheet = getTileSheet();
         BufferedImage img;
@@ -263,20 +244,6 @@ class Arrow extends Entity {
         setAlive(false);
     }
 
-    public String getImagePath() {
-        switch (getDirChar()) {
-            case ">":
-                return getImagePath("0.png");
-            case "v":
-                return getImagePath("1.png");
-            case "<":
-                return getImagePath("2.png");
-            case "^":
-                return getImagePath("3.png");
-        }
-        return getImagePath("0.png");
-    }
-
     public BufferedImage getImage(int scale) {
         int x = 0;
         switch (getDirChar()) {
@@ -325,10 +292,6 @@ class Puffer extends Entity {
             }
         }
         tick = (tick + 1) % (int) (Game.TPS * 2.25);
-    }
-
-    public String getImagePath() {
-        return getImagePath(frame[0] + "-" + frame[1] + ".png");
     }
 
     public BufferedImage getImage(int scale) {

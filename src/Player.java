@@ -1,8 +1,23 @@
-import java.awt.Color;
+import java.awt.*;
+import java.awt.image.*;
 import java.awt.event.*;
+import java.io.*;
+import javax.imageio.*;
 
 public class Player {
     public static Color COLOR = new Color(255, 235, 13);
+    public static String TYPE = "p";
+    private static BufferedImage TILESHEET;
+
+    static {
+        File imgPath = new File(Game.IMAGES + TYPE + "/tilesheet.png");
+        try {
+            TILESHEET = ImageIO.read(imgPath);
+        } catch (IOException e) {
+            System.out.println("File '" + imgPath.getPath() + "' not found");
+            e.printStackTrace();
+        }
+    }
 
     private int queuedKey;
     private double xPos;
@@ -11,6 +26,7 @@ public class Player {
     private double yDir = 0;
     private double xDirVis = 0;
     private double yDirVis = 0;
+    private int animationKey = 0;
     private boolean moving = false;
     private boolean win = false;
     private boolean alive = true;
@@ -173,13 +189,19 @@ public class Player {
         return 0;
     }
 
-    public String getImagePath(Level l) {
-        String folder = Game.IMAGES + "p/";
-        if (moving) {
-            return folder + "1-0.png";
-        } else {
-            return folder + "0-" + l.getAnimationKey(2, 6) + ".png";
+    public BufferedImage getImage(int scale) {
+        int x = 0;
+        int y = 1;
+        if (!moving) {
+            y = 0;
+            x = animationKey;
         }
+
+        return Cell.transformImage(TILESHEET.getSubimage(x * Game.IMAGE_SIZE, y * Game.IMAGE_SIZE, Game.IMAGE_SIZE, Game.IMAGE_SIZE), getDirVis() * Math.PI / 2, scale / Game.IMAGE_SIZE);
+    }
+
+    public void setAnimationKey(int value) {
+        animationKey = value;
     }
 
     public static double round(double value, int decimalPlaces) {

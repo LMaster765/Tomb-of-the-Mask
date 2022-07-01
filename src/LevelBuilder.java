@@ -7,7 +7,7 @@ import javax.imageio.*;
 
 public class LevelBuilder implements KeyListener, MouseListener, MouseMotionListener {
     public static String EXPORT_LOCATION = "bin/Level Stuff/exportedLevel.txt";
-    
+
     private DrawingPanel frame;
     private Graphics g;
     private ArrayList<ArrayList<Cell>> level;
@@ -166,62 +166,16 @@ public class LevelBuilder implements KeyListener, MouseListener, MouseMotionList
                 int yScreen = y * scale;
                 // draw tile
                 BufferedImage imgTest = c.getImage(1);
-                if (imgTest != null) {
-                    ((Graphics2D) g2).setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
-                    g2.fillRect(xScreen, yScreen, scale, scale);
-                    ((Graphics2D) g2).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
-                    g2.drawImage(Cell.transformImage(imgTest, -c.getRotation() * Math.PI / 2,
-                            scale / (double) Game.IMAGE_SIZE), xScreen, yScreen, null);
-                } else {
-                    String file = c.getImagePath();
-                    try {
-                        BufferedImage i = ImageIO.read(new File(file));
-                        g2.setColor(Cell.COLOR);
-                        g2.fillRect(xScreen, yScreen, scale, scale);
-                        g2.drawImage(
-                                Cell.transformImage(i, -c.getRotation() * Math.PI / 2,
-                                        scale / (double) Game.IMAGE_SIZE),
-                                xScreen, yScreen, frame);
-                    } catch (IOException e) {
-                        g2.setColor(c.getColor());
-                        g2.fillRect(xScreen, yScreen, scale, scale);
+                ((Graphics2D) g2).setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+                g2.fillRect(xScreen, yScreen, scale, scale);
+                ((Graphics2D) g2).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+                g2.drawImage(Cell.transformImage(imgTest, -c.getRotation() * Math.PI / 2,
+                        scale / (double) Game.IMAGE_SIZE), xScreen, yScreen, null);
 
-                        if (c.getType().equals("b")) {
-                            BatCell b = (BatCell) c;
-                            g2.setColor(Color.BLACK);
-                            g2.drawString(b.getDir(), xScreen + scale / 4, yScreen + scale);
-                        }
-                    }
-                }
                 // draw dots
-                if (c.getDot(scale) != null) {
-                    g2.drawImage(Cell.transformImage(c.getDot(scale), 0, scale / (double) Game.IMAGE_SIZE),
-                            xScreen, yScreen, null);
-                    System.out.println(c.getValue());
-                } else if (c.getValue() > 0) {
-                    try {
-                        BufferedImage dot = null;
-                        int fr = c.getValueTick();
-                        switch (c.getValue()) {
-                            case 1:
-                                dot = ImageIO.read(new File(Game.IMAGES + "dots/dot-" + fr + ".png"));
-                                break;
-                            case 2:
-                                dot = ImageIO.read(new File(Game.IMAGES + "dots/coin-" + fr + ".png"));
-                                break;
-                            case 3:
-                                dot = ImageIO.read(new File(Game.IMAGES + "dots/star-" + fr + ".png"));
-                                break;
-                            case 4:
-                                dot = ImageIO.read(new File(Game.IMAGES + "dots/box-" + fr + ".png"));
-                                break;
-                        }
-                        g2.drawImage(Cell.transformImage(dot, 0, scale / (double) Game.IMAGE_SIZE), xScreen, yScreen,
-                                frame);
-                    } catch (IOException e) {
-                        System.out.println("Dot Value '" + c.getValue() + "' Image not Found!");
-                    }
-                }
+                g2.drawImage(Cell.transformImage(c.getDot(scale), 0, scale / (double) Game.IMAGE_SIZE),
+                        xScreen, yScreen, null);
+                System.out.println(c.getValue());
             }
         }
         draw();
@@ -332,68 +286,15 @@ public class LevelBuilder implements KeyListener, MouseListener, MouseMotionList
                     int yScreen = y * scale;
                     // draw tile
                     BufferedImage imgTest = c.getImage(1);
-                    if (imgTest != null) {
-                        ((Graphics2D) g2).setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
-                        g2.fillRect(xScreen, yScreen, scale, scale);
-                        ((Graphics2D) g2).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
-                        g2.drawImage(Cell.transformImage(imgTest, -c.getRotation() * Math.PI / 2,
-                                scale / (double) Game.IMAGE_SIZE), xScreen, yScreen, null);
-                    } else {
-                        String file = c.getImagePath();
-                        try {
-                            BufferedImage i = ImageIO.read(new File(file));
-                            g2.setColor(Cell.COLOR);
-                            g2.fillRect(xScreen, yScreen, scale, scale);
-                            g2.drawImage(
-                                    Cell.transformImage(i, -c.getRotation() * Math.PI / 2,
-                                            scale / (double) Game.IMAGE_SIZE),
-                                    xScreen, yScreen, frame);
-                        } catch (IOException ex) {
-                            g2.setColor(c.getColor());
-                            g2.fillRect(xScreen, yScreen, scale, scale);
-
-                            if (c.getType().equals("b")) {
-                                BatCell b = (BatCell) c;
-                                g2.setColor(Color.BLACK);
-                                g2.drawString(b.getDir(), xScreen + scale / 4, yScreen + scale);
-                            }
-                            if (c.getType().equals("j")) {
-                                Spring j = (Spring) c;
-                                g2.setColor(Color.BLACK);
-                                g2.drawString(j.getDir(), xScreen + scale / 4, yScreen + scale);
-                            }
-                        }
-                    }
+                    ((Graphics2D) g2).setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+                    g2.fillRect(xScreen, yScreen, scale, scale);
+                    ((Graphics2D) g2).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+                    g2.drawImage(Cell.transformImage(imgTest, -c.getRotation() * Math.PI / 2,
+                            scale / (double) Game.IMAGE_SIZE), xScreen, yScreen, null);
                     // draw dots
-                    if (c.getDot(scale) != null) {
-                        g2.drawImage(Cell.transformImage(c.getDot(scale), 0, scale / (double) Game.IMAGE_SIZE),
-                                xScreen, yScreen, null);
-                        System.out.println(c.getValue());
-                    } else if (c.getValue() > 0) {
-                        try {
-                            BufferedImage dot = null;
-                            int fr = c.getValueTick();
-                            switch (c.getValue()) {
-                                case 1:
-                                    dot = ImageIO.read(new File(Game.IMAGES + "dots/dot-" + fr + ".png"));
-                                    break;
-                                case 2:
-                                    dot = ImageIO.read(new File(Game.IMAGES + "dots/coin-" + fr + ".png"));
-                                    break;
-                                case 3:
-                                    dot = ImageIO.read(new File(Game.IMAGES + "dots/star-" + fr + ".png"));
-                                    break;
-                                case 4:
-                                    dot = ImageIO.read(new File(Game.IMAGES + "dots/box-" + fr + ".png"));
-                                    break;
-                            }
-                            g2.drawImage(Cell.transformImage(dot, 0, scale / (double) Game.IMAGE_SIZE), xScreen,
-                                    yScreen,
-                                    frame);
-                        } catch (IOException ex) {
-                            System.out.println("Dot Value '" + c.getValue() + "' Image not Found!");
-                        }
-                    }
+                    g2.drawImage(Cell.transformImage(c.getDot(scale), 0, scale / (double) Game.IMAGE_SIZE),
+                            xScreen, yScreen, null);
+                    System.out.println(c.getValue());
                 }
             }
         }

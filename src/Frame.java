@@ -93,6 +93,12 @@ public class Frame {
                 g.drawImage(e.getImage(scale), x, y, null);
             }
         }
+        Player p = level.getPlayer();
+        int x = (int) (p.getX() * scale);
+        int y = (int) (p.getY() * scale);
+        g.drawImage(p.getImage(scale), x, y, null);
+
+
         g.dispose();
     }
 
