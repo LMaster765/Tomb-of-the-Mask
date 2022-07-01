@@ -1,0 +1,16 @@
+0 - no value
+1 - dot
+2 - coin
+3 - star
+4 - block
+
+_   empty (with 01234 for value)
+p   player
+w   wall
+k   kill
+t   spike trap
+s   spike (with 01234 for value)
+b   bat (with >v<^ for direction)
+a   arrow launcher (with >v<^ for direction)
+f   pufferfish
+j   spring (with >v<^ for direction)
