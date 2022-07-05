@@ -5,8 +5,12 @@ import java.io.*;
 import javax.imageio.*;
 
 public class Cell {
-    public static Color COLOR = Color.BLACK;
-    public static String TYPE = "_";
+    public static final Color GOOD = new Color(255, 235, 13);
+    public static final Color BAD = new Color(0, 255, 212);
+    public static final Color NEUTRAL = new Color(202, 0, 255);
+    public static final Color COLOR = Color.BLACK;
+    public static final String TYPE = "_";
+
     private static BufferedImage TILESHEET;
     private static BufferedImage VALUESHEET;
 
@@ -31,7 +35,8 @@ public class Cell {
     private BufferedImage tileSheet;
     private boolean kill;
     private boolean solid;
-    private boolean needsRedraw = true;
+    private boolean needsColorRedraw = true;
+    private boolean needsTextureRedraw = true;
     private boolean needsDotRedraw = true;
     private String type;
     private String imgCode;
@@ -227,9 +232,17 @@ public class Cell {
         return solid;
     }
 
-    public boolean needsRedraw() {
-        if (needsRedraw == true) {
-            needsRedraw = false;
+    public boolean needsColorRedraw() {
+        if (needsColorRedraw == true) {
+            needsColorRedraw = false;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean needsTextureRedraw() {
+        if (needsTextureRedraw == true) {
+            needsTextureRedraw = false;
             return true;
         }
         return false;
@@ -243,8 +256,12 @@ public class Cell {
         return false;
     }
 
-    public void setNeedsRedraw(boolean value) {
-        needsRedraw = value;
+    public void setneedsColorRedraw(boolean value) {
+        needsColorRedraw = value;
+    }
+
+    public void setneedsTextureRedraw(boolean value) {
+        needsTextureRedraw = value;
     }
 
     public void setNeedsDotRedraw(boolean value) {
@@ -266,8 +283,10 @@ public class Cell {
         if (tileSheet != null) {
             int[] coords = getImageCoords();
 
-            return transformImage(tileSheet.getSubimage(coords[0] * Game.IMAGE_SIZE, coords[1] * Game.IMAGE_SIZE, Game.IMAGE_SIZE,
-                    Game.IMAGE_SIZE), 0, scale / Game.IMAGE_SIZE);
+            return transformImage(
+                    tileSheet.getSubimage(coords[0] * Game.IMAGE_SIZE, coords[1] * Game.IMAGE_SIZE, Game.IMAGE_SIZE,
+                            Game.IMAGE_SIZE),
+                    0, scale / Game.IMAGE_SIZE);
         }
         return null;
     }
@@ -277,8 +296,10 @@ public class Cell {
      */
     public BufferedImage getDot(double scale) {
         if (VALUESHEET != null && value > 0) {
-            return transformImage(VALUESHEET.getSubimage(valueTick * Game.IMAGE_SIZE, (value - 1) * Game.IMAGE_SIZE, Game.IMAGE_SIZE,
-                    Game.IMAGE_SIZE), 0, scale / Game.IMAGE_SIZE);
+            return transformImage(
+                    VALUESHEET.getSubimage(valueTick * Game.IMAGE_SIZE, (value - 1) * Game.IMAGE_SIZE, Game.IMAGE_SIZE,
+                            Game.IMAGE_SIZE),
+                    0, scale / Game.IMAGE_SIZE);
         }
         return null;
     }
@@ -412,7 +433,7 @@ public class Cell {
 }
 
 class Wall extends Cell {
-    public static Color COLOR = new Color(202, 0, 255);
+    public static Color COLOR = Cell.NEUTRAL;
     public static String TYPE = "w";
     private static BufferedImage TILESHEET;
 
@@ -432,7 +453,7 @@ class Wall extends Cell {
 }
 
 class Kill extends Cell {
-    public static Color COLOR = Color.CYAN;
+    public static Color COLOR = Cell.BAD;
     public static String TYPE = "k";
     private static BufferedImage TILESHEET;
 
@@ -452,9 +473,11 @@ class Kill extends Cell {
 }
 
 class Trap extends Cell {
-    public static Color COLOR = Color.CYAN;
+    public static Color COLOR = Cell.BAD;
     public static String TYPE = "t";
     private static BufferedImage TILESHEET;
+
+    private int tick = 0;
 
     static {
         File imgPath = new File(Game.IMAGES + TYPE + "/tilesheet.png");
@@ -466,29 +489,29 @@ class Trap extends Cell {
         }
     }
 
-    private int lastTick;
-
     public Trap(int xPos, int yPos, String data) {
         super(xPos, yPos, TYPE, "0", true, false, COLOR, new String[] { "w", "t", "k" }, TILESHEET);
     }
 
     public void update(Level l) {
-        super.update(l);
-
-        int currentTick = (l.getAnimationKey(4, 2) + 1) % 2;
-        if (currentTick != lastTick) {
-            setNeedsRedraw(true);
-            lastTick = currentTick;
+        int newTick = l.getAnimationKey(5, 2);
+        if (tick != newTick) {
+            tick = newTick;
+            setneedsColorRedraw(true);
         }
     }
 
-    public int[] getImageCoords() {
-        return super.getImageCoords(lastTick);
+    public Color getColor() {
+        if (tick == 0) {
+            return COLOR;
+        } else {
+            return Cell.NEUTRAL;
+        }
     }
 }
 
 class Spike extends Cell {
-    public static Color COLOR = Color.CYAN;
+    public static Color COLOR = Cell.BAD;
     public static String TYPE = "s";
     private static BufferedImage TILESHEET;
 
@@ -519,7 +542,7 @@ class Spike extends Cell {
         super.update(l);
         if (tick == -1 && imgType != 0) {
             imgType = 0;
-            setNeedsRedraw(true);
+            setneedsTextureRedraw(true);
         }
 
         if (tick >= 0) {
@@ -527,33 +550,27 @@ class Spike extends Cell {
             switch (tick) {
                 case Game.TPS / 15:
                     imgType = 1;
-                    setNeedsRedraw(true);
+                    setneedsTextureRedraw(true);
                     break;
                 case Game.TPS / 2:
                     setKill(true);
                     imgType = 3;
-                    setNeedsRedraw(true);
+                    setneedsTextureRedraw(true);
                     break;
                 case (Game.TPS / 2) + Game.TPS / 15:
                     setKill(true);
                     imgType = 2;
-                    setNeedsRedraw(true);
+                    setneedsTextureRedraw(true);
                     break;
                 case (int) (Game.TPS * 1.5) - Game.TPS / 15:
                     setKill(false);
                     imgType = 1;
-                    setNeedsRedraw(true);
+                    setneedsTextureRedraw(true);
                     break;
                 case (int) (Game.TPS * 1.5):
                     tick = -1;
             }
         }
-    }
-
-    public Color getColor() {
-        if (isKill())
-            return super.getColor();
-        return Color.BLACK;
     }
 
     public int[] getImageCoords() {
@@ -566,7 +583,7 @@ class Spike extends Cell {
 }
 
 class Goal extends Cell {
-    public static Color COLOR = Color.ORANGE;
+    public static Color COLOR = Cell.GOOD;
     public static String TYPE = "g";
     private static BufferedImage TILESHEET;
 
@@ -591,7 +608,7 @@ class Goal extends Cell {
         int tick = l.getAnimationKey(1, 4);
         if (tick != animTick) {
             animTick = tick;
-            setNeedsRedraw(true);
+            setneedsTextureRedraw(true);
         }
     }
 
@@ -607,7 +624,7 @@ class Goal extends Cell {
 }
 
 class Shooter extends Cell {
-    public static Color COLOR = Wall.COLOR;
+    public static Color COLOR = Cell.BAD;
     public static String TYPE = "a";
     private static BufferedImage TILESHEET;
 
@@ -635,7 +652,8 @@ class Shooter extends Cell {
         tick++;
         if (img == 1 && tick % (Game.TPS / 5) == 0) {
             img = 0;
-            setNeedsRedraw(true);
+            setneedsTextureRedraw(true);
+            setneedsColorRedraw(true);
         }
         if (tick >= Game.TPS) {
             tick = 0;
@@ -657,7 +675,16 @@ class Shooter extends Cell {
             }
             l.spawnArrow(x, y, dir);
             img = 1;
-            setNeedsRedraw(true);
+            setneedsTextureRedraw(true);
+            setneedsColorRedraw(true);
+        }
+    }
+
+    public Color getColor() {
+        if (img == 1) {
+            return COLOR;
+        } else {
+            return Wall.COLOR;
         }
     }
 
@@ -685,6 +712,7 @@ class Shooter extends Cell {
 }
 
 class PufferBlock extends Cell {
+    public static Color COLOR = Color.GRAY;
     public static String TYPE = "f";
     private static BufferedImage TILESHEET;
 
@@ -699,13 +727,13 @@ class PufferBlock extends Cell {
     }
 
     public PufferBlock(int xPos, int yPos, String data) {
-        super(xPos, yPos, TYPE, "0", true, false, Color.GRAY, new String[] {}, TILESHEET);
-        setNeedsRedraw(false);
+        super(xPos, yPos, TYPE, "0", true, false, COLOR, new String[] {}, TILESHEET);
+        setneedsTextureRedraw(false);
     }
 }
 
 class Spring extends Cell {
-    public static Color COLOR = Color.ORANGE;
+    public static Color COLOR = Cell.GOOD;
     public static String TYPE = "j";
     private static BufferedImage TILESHEET;
 
@@ -734,11 +762,11 @@ class Spring extends Cell {
             switch (tick) {
                 case Game.TPS / 10:
                     imgType = 2;
-                    setNeedsRedraw(true);
+                    setneedsTextureRedraw(true);
                     break;
                 case Game.TPS / 2:
                     imgType = 0;
-                    setNeedsRedraw(true);
+                    setneedsTextureRedraw(true);
                     break;
             }
         }
@@ -762,7 +790,7 @@ class Spring extends Cell {
         }
         tick = 0;
         imgType = 1;
-        setNeedsRedraw(true);
+        setneedsTextureRedraw(true);
 
         return super.touch(p);
     }

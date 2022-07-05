@@ -29,34 +29,6 @@ public class Frame {
         }
     }
 
-    public static BufferedImage scaleImage(BufferedImage img, double scale) {
-        /*
-         * VER 1: VERY SLOW (~17 ms)
-         * 
-         * int w = img.getWidth();
-         * int h = img.getHeight();
-         * 
-         * BufferedImage output = new BufferedImage((int) (w * scale), (int) (h *
-         * scale), img.getType());
-         * AffineTransform at = new AffineTransform();
-         * at.scale(scale, scale);
-         * 
-         * AffineTransformOp op = new AffineTransformOp(at,
-         * AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-         * op.filter(img, output);
-         * return output;
-         */
-
-        int w = (int) (img.getWidth() * scale);
-        int h = (int) (img.getHeight() * scale);
-
-        BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = output.getGraphics();
-        g.drawImage(img, 0, 0, w, h, 0, 0, img.getWidth(), img.getHeight(), null);
-        g.dispose();
-        return output;
-    }
-
     public static BufferedImage rotateImage(BufferedImage img, double rotation) {
         double sin = Math.abs(Math.sin(rotation));
         double cos = Math.abs(Math.cos(rotation));
@@ -74,31 +46,20 @@ public class Frame {
         return output;
     }
 
-    public void updateEntityLayer() {
-        BufferedImage layer = layers.get(3);
-        layer = new BufferedImage(layer.getWidth(), layer.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        layers.set(3, layer);
-
+    public void updateColorLayer() {
+        BufferedImage layer = layers.get(0);
         Graphics g = layer.getGraphics();
         int scale = level.getCamera().getScale();
-        for (Entity e : level.getEntities()) {
-            if (e.getType().equals("f") || level.getCamera().isVisible(e.getX(), e.getY())) {
-                e.updateGraphics(level);
-                int x = (int) (e.getX() * scale);
-                int y = (int) (e.getY() * scale);
-                if (e.getType().equals("f")) {
-                    x -= scale;
-                    y -= scale;
+        for (ArrayList<Cell> row : level.getMap()) {
+            for (Cell c : row) {
+                if (c.needsColorRedraw()) {
+                    int x = c.getX() * scale;
+                    int y = c.getY() * scale;
+                    g.setColor(c.getColor());
+                    g.fillRect(x, y, scale, scale);
                 }
-                g.drawImage(e.getImage(scale), x, y, null);
             }
         }
-        Player p = level.getPlayer();
-        int x = (int) (p.getX() * scale);
-        int y = (int) (p.getY() * scale);
-        g.drawImage(p.getImage(scale), x, y, null);
-
-
         g.dispose();
     }
 
@@ -108,7 +69,7 @@ public class Frame {
         int scale = level.getCamera().getScale();
         for (ArrayList<Cell> row : level.getMap()) {
             for (Cell c : row) {
-                if (c.needsRedraw()) {
+                if (c.needsTextureRedraw()) {
                     int x = c.getX() * scale;
                     int y = c.getY() * scale;
                     BufferedImage tile = c.getImage(scale);
@@ -144,8 +105,38 @@ public class Frame {
         g.dispose();
     }
 
+    public void updateEntityLayer() {
+        BufferedImage layer = layers.get(3);
+        layer = new BufferedImage(layer.getWidth(), layer.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        layers.set(3, layer);
+
+        Graphics g = layer.getGraphics();
+        int scale = level.getCamera().getScale();
+        for (Entity e : level.getEntities()) {
+            if (e.getType().equals("f") || level.getCamera().isVisible(e.getX(), e.getY())) {
+                e.updateGraphics(level);
+                int x = (int) (e.getX() * scale);
+                int y = (int) (e.getY() * scale);
+                if (e.getType().equals("f")) {
+                    x -= scale;
+                    y -= scale;
+                }
+                g.drawImage(e.getImage(scale), x, y, null);
+            }
+        }
+        Player p = level.getPlayer();
+        int x = (int) (p.getX() * scale);
+        int y = (int) (p.getY() * scale);
+        g.drawImage(p.getImage(scale), x, y, null);
+
+
+        g.dispose();
+    }
+
     public BufferedImage buildFrame() {
         // update everyting
+        TimeTracker.start("color layer");
+        updateColorLayer();
         TimeTracker.start("tile layer");
         updateTileLayer();
         TimeTracker.start("dot layer");
@@ -176,10 +167,6 @@ public class Frame {
         g.setColor(Cell.COLOR);
         g.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
         for (BufferedImage layer : layers) {
-            // System.out.println(xMin + " " + yMin + " : " + w + " " + h + " : " + xOffset
-            // + " " + yOffset);
-            // g.drawImage(layer.getSubimage(sx1, sy1, w, h), dx1, dy1, null);
-            // g.drawImage(scaleImage(layer, scale), -c.getX(), -c.getY(), null);
             g.drawImage(layer, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
         }
         g.dispose();

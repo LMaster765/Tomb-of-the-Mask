@@ -3,16 +3,6 @@ import java.awt.event.*;
 import java.util.*;
 import java.io.*;
 
-/**
- * TO DO:
- * 1. Make levels!
- * 2. Replace menu Level score with stars
- * 3. Progress Saving!
- * 4. Coin shop?
- * 5. More block & entity types (Flip Block, Monkey, Snake, Switch Blocks)
- * 6. A final boss??? (steal something and the level falls apart?)
- */
-
 public class Game extends MouseAdapter implements KeyListener {
     public static final int IMAGE_SIZE = 12;
     public static final int WIDTH = Camera.DEFAULT_SCALE * 13;
@@ -202,7 +192,7 @@ public class Game extends MouseAdapter implements KeyListener {
                             break;
                     }
                 }
-                g.setColor(Color.GRAY);
+                g.setColor(Color.GRAY); 
                 if (levels.get(j).isUnlocked())
                     g.setColor(Wall.COLOR);
                 if (levels.get(j).getBestScore() == 7)

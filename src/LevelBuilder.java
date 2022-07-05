@@ -3,7 +3,6 @@ import java.awt.event.*;
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
-import javax.imageio.*;
 
 public class LevelBuilder implements KeyListener, MouseListener, MouseMotionListener {
     public static String EXPORT_LOCATION = "bin/Level Stuff/exportedLevel.txt";
